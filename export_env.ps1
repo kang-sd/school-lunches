@@ -34,11 +34,14 @@ $installerContent = @"
 `$ErrorActionPreference = "Stop"
 Write-Host "🚀 노트북 Antigravity 환경 원클릭 세팅을 시작합니다!" -ForegroundColor Green
 
-# 1. MCP 설정 파일 복원
+# 1. MCP 설정 파일 복원 (사용자 경로 C:\Users\기존이름 -> 현재 $HOME. 환경에 맞게 자동 치환)
 `$mcpDest = "`$HOME\.gemini\antigravity"
 if (-not (Test-Path `$mcpDest)) { New-Item -ItemType Directory -Force -Path `$mcpDest | Out-Null }
-Copy-Item -Path ".\mcp_config.json" -Destination "`$mcpDest" -Force
-Write-Host "  ✔️ MCP 서버 설정(mcp_config.json) 복원 완료"
+`$configContent = Get-Content -Raw -Path ".\mcp_config.json"
+`$escapedHome = `$HOME.Replace('\', '\\')
+`$configContent = `$configContent -replace 'C:\\\\Users\\\\[^\\]+', `$escapedHome
+Set-Content -Path "`$mcpDest\mcp_config.json" -Value `$configContent -Encoding UTF8
+Write-Host "  ✔️ MCP 서버 설정(mcp_config.json) 복원 및 사용자 경로 변경 완료"
 
 # 2. 스킬 폴더 복원
 if (Test-Path ".\skills") {
@@ -59,6 +62,15 @@ Pause
 "@
 Set-Content -Path $installerPath -Value $installerContent -Encoding UTF8
 
+# 4-1. 더블클릭으로 바로 실행할 수 있는 배치파일(.bat) 생성
+$batPath = "$backupDir\install_env.bat"
+$batContent = @"
+@echo off
+echo 노트북 환경 세팅을 시작합니다...
+powershell.exe -ExecutionPolicy Bypass -File "%~dp0install_env.ps1"
+pause
+"@
+Set-Content -Path $batPath -Value $batContent -Encoding Default
 # 5. 전체를 압축(ZIP)
 $zipPath = "$HOME\Desktop\Antigravity_Setup.zip"
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
@@ -69,4 +81,4 @@ Remove-Item -Recurse -Force $backupDir
 
 Write-Host "`n✅ 바탕화면에 [Antigravity_Setup.zip] 압축 파일이 완성되었습니다!" -ForegroundColor Green
 Write-Host "이 압축 파일을 USB나 카카오톡 나와의 채팅으로 노트북에 옮긴 후,"
-Write-Host "압축을 풀고 [install_env.ps1] 파일을 우클릭하여 'PowerShell에서 실행'을 누르면 끝입니다."
+Write-Host "압축을 풀고 [install_env.bat] (톱니바퀴 아이콘) 파일을 '더블 클릭' 하시면 끝입니다!"

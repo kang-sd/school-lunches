@@ -2,9 +2,10 @@ import { google } from 'googleapis';
 import * as ExcelJS from 'exceljs';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 // 사용자 정보
-const SERVICE_ACCOUNT_FILE = 'C:\\Users\\ISJSU\\.config\\mcp-gdrive\\service-account.json';
+const SERVICE_ACCOUNT_FILE = path.join(os.homedir(), '.config', 'mcp-gdrive', 'service-account.json');
 const FOLDER_ID = '1k3VV04qx8-AjJnykeWFetCMznmPrFVXJ';
 
 async function createExcelFiles() {

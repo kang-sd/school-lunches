@@ -1,6 +1,8 @@
 import { google } from 'googleapis';
+import * as os from 'os';
+import * as path from 'path';
 
-const SERVICE_ACCOUNT_FILE = 'C:\\Users\\ISJSU\\.config\\mcp-gdrive\\service-account.json';
+const SERVICE_ACCOUNT_FILE = path.join(os.homedir(), '.config', 'mcp-gdrive', 'service-account.json');
 
 const FILES = [
   {
